@@ -1,0 +1,23 @@
+{
+  "name": "my-web-project",
+  "version": "1.0.0",
+  "description": "一个简单的网页项目",
+  "main": "src/scripts/app.js",
+  "scripts": {
+    "start": "live-server src",
+    "build": "echo '构建项目'",
+    "test": "echo '运行测试'"
+  },
+  "keywords": [
+    "web",
+    "html",
+    "css",
+    "javascript"
+  ],
+  "author": "你的名字",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的网页项目</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4, #ff9a9e);
+            background-size: 400% 400%;
+            animation: gradientBackground 10s ease-in-out infinite;
+            color: #fff;
+        }
+
+        @keyframes gradientBackground {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        header {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-size: 2em;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .profile {
+            margin-bottom: 20px;
+        }
+
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .gallery-button-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .gallery-button {
+            padding: 20px 40px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .gallery-button:hover {
+            background-color: #555;
+        }
+
+        .video-container {
+            width: 400px;
+            height: 300px;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+        }
+
+        .video-list {
+            margin-top: 20px;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .video-item {
+            margin: 10px;
+        }
+
+        .small-video {
+            width: 150px;
+            height: 100px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>欢迎来到我的网页项目</h1>
+    </header>
+    <main>
+        <div class="profile">
+            <img src="path/to/profile-picture.jpg" alt="Profile Picture" class="profile-picture">
+            <h2>用户名</h2>
+            <p>这是用户的个人简介。</p>
+        </div>
+        <div class="content-container">
+            <div class="gallery-button-container">
+                <button class="gallery-button" onclick="location.href='gallery.html'">打开相册</button>
+                <input type="file" id="uploadVideoInput" accept="video/*" onchange="uploadVideo(event)" style="display: none;">
+                <button class="gallery-button" onclick="document.getElementById('uploadVideoInput').click()">导入视频</button>
+                <button class="gallery-button" onclick="location.href='video-list.html'">查看视频列表</button>
+            </div>
+            <div class="video-container">
+                <video id="videoPlayer" controls>
+                    <source id="videoSource" src="" type="video/mp4">
+                    您的浏览器不支持 HTML5 视频。
+                </video>
+                <button class="gallery-button" onclick="selectVideo()">选择播放视频</button>
+            </div>
+        </div>
+        <div id="videoList" class="video-list"></div>
+    </main>
+    <footer>
+        <p>&copy; 2023 我的网页项目</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadVideos();
+            const selectedVideo = localStorage.getItem('selectedVideo');
+            if (selectedVideo) {
+                playVideo(selectedVideo);
+                localStorage.removeItem('selectedVideo');
+            }
+        });
+
+        function uploadVideo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const videos = JSON.parse(localStorage.getItem('videos')) || [];
+                    videos.push(e.target.result);
+                    localStorage.setItem('videos', JSON.stringify(videos));
+                    addVideoToList(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function loadVideos() {
+            const videos = JSON.parse(localStorage.getItem('videos')) || [];
+            videos.forEach(video => addVideoToList(video));
+        }
+
+        function addVideoToList(videoSrc) {
+            const videoList = document.getElementById('videoList');
+            const videoItem = document.createElement('div');
+            videoItem.className = 'video-item';
+            videoItem.innerHTML = `<video src="${videoSrc}" controls class="small-video"></video>`;
+            videoList.appendChild(videoItem);
+        }
+
+        function playVideo(videoSrc) {
+            const videoPlayer = document.getElementById('videoPlayer');
+            const videoSource = document.getElementById('videoSource');
+            videoSource.src = videoSrc;
+            videoPlayer.load();
+            videoPlayer.play();
+        }
+
+        function selectVideo() {
+            window.location.href = 'video-list.html';
+        }
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频列表</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <header>
+        <h1>视频列表</h1>
+    </header>
+    <main>
+        <div id="videoList" class="video-list"></div>
+    </main>
+    <footer>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadVideos();
+        });
+
+        function loadVideos() {
+            const videos = JSON.parse(localStorage.getItem('videos')) || [];
+            const videoList = document.getElementById('videoList');
+            videos.forEach((video, index) => {
+                const videoItem = document.createElement('div');
+                videoItem.className = 'video-item';
+                videoItem.innerHTML = `<button onclick="playVideo(${index})">播放视频 ${index + 1}</button>`;
+                videoList.appendChild(videoItem);
+            });
+        }
+
+        function playVideo(index) {
+            const videos = JSON.parse(localStorage.getItem('videos')) || [];
+            const videoSrc = videos[index];
+            localStorage.setItem('selectedVideo', videoSrc);
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
